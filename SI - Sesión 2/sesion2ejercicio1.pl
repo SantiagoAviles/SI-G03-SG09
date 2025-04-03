@@ -1,4 +1,3 @@
-% Definición de relaciones de parentesco
 padre(hans, santiago).
 padre(hans, carolina).
 padre(hant, hans).
@@ -44,9 +43,3 @@ mujer(cynthia).
 mujer(alexandra).
 mujer(guillermina).
 mujer(carmen).
-
-% Consultas de ejemplo
-% ?- abuelo(X, santiago).
-% ?- padre(X, carolina).
-% ?- hermana(X, hans).
-% ?- tio(X, santiago).
