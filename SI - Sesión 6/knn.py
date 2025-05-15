@@ -45,7 +45,7 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 # Probar diferentes valores de K
-k_values = range(1, 120)
+k_values = range(20, 120)
 accuracies = []
 
 for k in k_values:
@@ -88,6 +88,16 @@ print("Reporte de Clasificación:\n", class_report)
 cv_scores = cross_val_score(knn_best, X_train, y_train, cv=5)
 print(f"Precisión promedio con validación cruzada: {np.mean(cv_scores):.2f}")
 
+# Visualización de predicciones correctas/incorrectas
+plt.figure(figsize=(8,6))
+sns.scatterplot(x=X_test[:,1], y=X_test[:,5], hue=y_test==y_pred, palette=['red','green'])
+plt.xlabel('Glucose (estandarizada)')
+plt.ylabel('BMI (estandarizado)')
+plt.title('Predicciones Correctas (Verde) vs Incorrectas (Rojo)')
+plt.legend(title='Predicción', labels=['Incorrecta', 'Correcta'])
+plt.show()
+
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
@@ -122,13 +132,4 @@ plt.ylim(0.6, 1.0)
 plt.ylabel('Precisión')
 plt.title('Comparación de Diferentes Algoritmos de Clasificación')
 plt.xticks(rotation=45)
-plt.show()
-
-# Visualización de predicciones correctas/incorrectas
-plt.figure(figsize=(8,6))
-sns.scatterplot(x=X_test[:,1], y=X_test[:,5], hue=y_test==y_pred, palette=['red','green'])
-plt.xlabel('Glucose (estandarizada)')
-plt.ylabel('BMI (estandarizado)')
-plt.title('Predicciones Correctas (Verde) vs Incorrectas (Rojo)')
-plt.legend(title='Predicción', labels=['Incorrecta', 'Correcta'])
 plt.show()
