@@ -137,3 +137,89 @@ print(caracteristicas_cluster)
 proporcion_cluster = df['cluster'].value_counts(normalize=True).round(4) * 100
 print("\nProporción de Días en Cada Cluster (%):")
 print(proporcion_cluster)
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+# Usamos el mismo número de clusters que encontramos óptimo para GMM
+kmeans = KMeans(n_clusters=n_optimo, random_state=42)
+kmeans.fit(X_scaled)
+df['kmeans_cluster'] = kmeans.predict(X_scaled)
+
+# Visualización de los clusters de K-Means
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=df['kmeans_cluster'], cmap='viridis')
+plt.title('Clustering con K-Means')
+plt.xlabel('Rango Diario Normalizado')
+plt.ylabel('Volatilidad Relativa Normalizada')
+plt.colorbar(scatter, label='Cluster')
+plt.show()
+
+# Comparación visual entre GMM y K-Means
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+# GMM
+scatter1 = ax1.scatter(X_scaled[:, 0], X_scaled[:, 1], c=df['cluster'], cmap='viridis')
+ax1.set_title('Gaussian Mixture Model (GMM)')
+ax1.set_xlabel('Rango Diario Normalizado')
+ax1.set_ylabel('Volatilidad Relativa Normalizada')
+plt.colorbar(scatter1, ax=ax1, label='Cluster')
+
+# K-Means
+scatter2 = ax2.scatter(X_scaled[:, 0], X_scaled[:, 1], c=df['kmeans_cluster'], cmap='viridis')
+ax2.set_title('K-Means Clustering')
+ax2.set_xlabel('Rango Diario Normalizado')
+ax2.set_ylabel('Volatilidad Relativa Normalizada')
+plt.colorbar(scatter2, ax=ax2, label='Cluster')
+
+plt.tight_layout()
+plt.show()
+
+# Calculamos el coeficiente de silueta para ambos modelos
+silhouette_gmm = silhouette_score(X_scaled, df['cluster'])
+silhouette_kmeans = silhouette_score(X_scaled, df['kmeans_cluster'])
+
+print(f"\nComparación de modelos:")
+print(f"Coeficiente de silueta para GMM: {silhouette_gmm:.4f}")
+print(f"Coeficiente de silueta para K-Means: {silhouette_kmeans:.4f}")
+
+# Estadísticas de los clusters de K-Means
+estadisticas_kmeans = df.groupby('kmeans_cluster').agg({
+    'rango_diario': ['mean', 'std'],
+    'volatilidad_relativa': ['mean', 'std'],
+    'volumen_normalizado': ['mean', 'std'],
+    'kmeans_cluster': 'count'
+}).round(2)
+
+print("\nEstadísticas por Cluster (K-Means):")
+print(estadisticas_kmeans)
+
+# Proporción de días en cada cluster (K-Means)
+proporcion_kmeans = df['kmeans_cluster'].value_counts(normalize=True).round(4) * 100
+print("\nProporción de Días en Cada Cluster (K-Means) (%):")
+print(proporcion_kmeans)
+
+# Visualización de los clusters en el tiempo (comparación)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), height_ratios=[1, 1])
+
+# GMM
+scatter1 = ax1.scatter(df['date'], df['close'], c=df['cluster'], cmap='viridis')
+ax1.set_title('GMM: Precio de Cierre por Cluster')
+ax1.set_xlabel('')
+ax1.set_ylabel('Precio')
+plt.colorbar(scatter1, ax=ax1, label='Cluster')
+
+# K-Means
+scatter2 = ax2.scatter(df['date'], df['close'], c=df['kmeans_cluster'], cmap='viridis')
+ax2.set_title('K-Means: Precio de Cierre por Cluster')
+ax2.set_xlabel('Fecha')
+ax2.set_ylabel('Precio')
+plt.colorbar(scatter2, ax=ax2, label='Cluster')
+
+plt.tight_layout()
+plt.show()
